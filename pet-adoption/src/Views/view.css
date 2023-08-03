@@ -1,0 +1,545 @@
+/* search view */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
+body {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+}
+/* ===================================== Search =================================*/
+.search-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+}
+
+.search-toggle {
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #7f7fd5;
+  color: #fff;
+  margin-bottom: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+}
+
+.search-toggle:hover {
+  background-color: #6a6af7;
+  box-shadow: 0px 15px 20px rgba(122, 46, 229, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.basic-search-form,
+.advanced-search-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 60%;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+.searchyourpet {
+  color: #333333;
+  padding: 10px;
+  border-radius: 10px;
+  font-family: "Kalam", cursive;
+}
+.search-input {
+  padding-top: 20px;
+  margin: 10px 0;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.search-button {
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #7f7fd5;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+}
+
+.search-button:hover {
+  background-color: #6a6af7;
+  box-shadow: 0px 15px 20px rgba(122, 46, 229, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.results-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 16px;
+  justify-items: center;
+  width: 80%;
+  margin: 20px auto;
+}
+
+.animal-card {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  background: #fff;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  height: 380px;
+  width: 250px;
+}
+
+.animal-card h2 {
+  margin-bottom: 8px;
+}
+
+.animal-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 20px;
+  object-fit: cover;
+  margin-top: 10px;
+}
+
+.see-more-button {
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #7f7fd5;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  position: absolute;
+  bottom: 15px;
+  left: 35%;
+}
+
+.see-more-button:hover {
+  background-color: #6a6af7;
+  box-shadow: 0px 15px 20px rgba(122, 46, 229, 0.4);
+  color: #fff;
+}
+
+/*================================== Settings ==================================*/
+
+.profile-settings-container {
+  padding-bottom: 100px;
+}
+.form-settings {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 60px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-settings {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/*================================ Style the text area =========================*/
+.text-settings {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/*====================== Style the error and success messages ===================*/
+.error {
+  color: #ff0000;
+  margin-bottom: 20px;
+}
+
+.success {
+  color: green;
+  margin-bottom: 20px;
+  font-size: medium;
+  font-weight: 600;
+}
+
+/*================================ Style the save button ========================*/
+.btn-settings-save {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #7f7fd5;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-settings-save:hover {
+  background-color: #6a6af7;
+  box-shadow: 0px 15px 20px rgba(122, 46, 229, 0.4);
+  color: #fff;
+}
+.profile-settings-container {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+.h1 {
+  font-size: 32px;
+  color: #333333;
+  margin-bottom: 20px;
+  margin-top: 30px;
+  font-family: "Roboto", sans-serif;
+  font-size: 32px;
+}
+p {
+  font-family: "Roboto", sans-serif;
+}
+input {
+  font-family: "Roboto", sans-serif;
+}
+h2 {
+  color: #333333;
+  font-family: "Roboto", sans-serif;
+}
+/*=============================== Pet Details ===================================*/
+
+.comt-p-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  text-align: center;
+  width: 90%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.p-name {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 1em;
+  font-family: "Kalam", cursive;
+}
+
+.p-image {
+  max-width: 50%;
+  height: auto;
+  border-radius: 5%;
+  margin-bottom: 20px;
+}
+
+.comt-p-div {
+  padding: 2em;
+  margin: 2em auto;
+  border-radius: 20px;
+  background-color: #ffffff;
+}
+
+.p-desc {
+  font-size: 1.3em;
+  margin-bottom: 20px;
+  color: #000000;
+  font-family: "Kalam", cursive;
+  border-bottom: 2px solid #7e7e7e;
+  padding: 0.5em 0;
+  font-weight: 600;
+}
+
+.button-details {
+  display: inline-block;
+  padding: 0.5em 1em;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 0.5em;
+}
+
+.button-details:hover {
+  background-color: #469fff;
+  box-shadow: 0px 15px 20px #c2defb;
+  color: #fff;
+}
+
+@media screen and (max-width: 600px) {
+  .comt-p-div {
+    width: 100%;
+    padding: 1em;
+  }
+
+  .p-name {
+    font-size: 1.5em;
+  }
+
+  .p-desc {
+    font-size: 0.9em;
+  }
+
+  .button-details {
+    font-size: 0.9em;
+    padding: 0.4em 0.8em;
+  }
+}
+
+/* ================================== My Petssss =============================== */
+.my-pets-box {
+  margin-left: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 1rem;
+  padding: 1rem;
+}
+
+.my-pets-p {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  background-color: #f8f8f8;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.seedetails {
+  text-decoration: none;
+  color: #6a6af7;
+  font-family: "Kalam", cursive;
+  font-size: larger;
+  font-weight: 500;
+  margin: 0 auto;
+  border-radius: 20px;
+  padding: 7px;
+  align-self: flex-start;
+}
+
+.seedetails:hover {
+  color: #5353fa;
+}
+
+.p-imagee {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 5px;
+}
+.switch {
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #7f7fd5;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  margin-top: 20px;
+  margin-left: 15px;
+}
+.switch:hover {
+  background-color: #6a6af7;
+  box-shadow: 0px 15px 20px rgba(122, 46, 229, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+/* ==================================== Pets =================================== */
+.allpetsh1 {
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+  font-family: "Kalam", cursive;
+}
+.all-pets-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.pet-card {
+  width: 430px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  background-color: #ffffff;
+}
+
+.pet-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+/* font-family: "Kalam", cursive;font-family: "Kalam", cursive;font-family: "Kalam", cursive;font-family: "Kalam", cursive;font-family: "Kalam", cursive; */
+.pet-details {
+  padding: 10px;
+  font-family: "Kalam", cursive;
+  margin-left: 10px;
+}
+.pet-details p {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 0.5em 0;
+  font-weight: 400;
+}
+
+.pet-details h2 {
+  font-size: 1.9em;
+  font-family: "Kalam", cursive;
+}
+.button-details1 {
+  text-decoration: none;
+  color: white;
+}
+
+@media only screen and (max-width: 768px) {
+  .pet-image {
+    width: 100px;
+    object-fit: cover;
+  }
+
+  .pet-card {
+    width: 70%;
+  }
+}
+/* =============================== h1 and button ============================== */
+.h-seet {
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+  font-family: "Kalam", cursive;
+}
+.p-none {
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+  font-size: larger;
+  font-family: "Kalam", cursive;
+}
+.h-set {
+  font-family: "Kalam", cursive;
+}
+/* =============================== spinner =============================== */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+/* ============================== Profie Card ============================ */
+.profile-card {
+  width: 60%;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  margin: 0 auto;
+  box-shadow: 0px 0px 15px -5px rgba(0, 0, 0, 0.75);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: "Kalam", cursive;
+}
+
+.profile-detail {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.profile-detail h3 {
+  color: #444;
+  margin-bottom: 5px;
+}
+
+.profile-detail p {
+  color: #666;
+}
+
+.btn-update {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-update:hover {
+  background-color: #0056b3;
+}
+.allpetsbounce {
+  margin: 0 auto;
+  margin-bottom: 30px;
+}
+/* bla */
+
+.next-page-button {
+  width: 120px;
+  height: 40px;
+  margin-top: 700px;
+  margin-left: 20px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.emessage {
+  font-size: large;
+  font-weight: 600;
+  font-family: "Kalam", cursive;
+}
+.button-det {
+  display: none;
+}
+.sorry {
+  font-family: "Kalam", cursive;
+  color: #673cdd;
+}
+.button-details:disabled {
+  background-color: grey;
+  cursor: not-allowed;
+}
