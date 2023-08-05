@@ -3,11 +3,13 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BounceLoader } from "react-spinners";
 import { LoginContext } from "../../../Context/LoginContext";
-import { Link } from "react-router-dom";
 
 export const UserDetailsViewAdmin = () => {
   const { userId, token } = useContext(LoginContext);
-  const { id } = useParams();
+  const params = useParams();
+  console.log("Params from URL:", params);
+  const { id } = params;
+  console.log("ID from URL:", id);
   const [user, setUser] = useState(null);
   const [ownedPets, setOwnedPets] = useState([]);
   const [fosteredPets, setFosteredPets] = useState([]);
@@ -80,7 +82,7 @@ export const UserDetailsViewAdmin = () => {
             </div>
           ) : (
             ownedPets.map((pet) => (
-              <div className="my-pets-p" key={pet.id}>
+              <div className="my-pets-p" key={pet._id}>
                 <h2 className="h-seet">{pet.name}</h2>
                 <img
                   className="p-imagee"
@@ -105,7 +107,7 @@ export const UserDetailsViewAdmin = () => {
             </div>
           ) : (
             savedPets.map((pet) => (
-              <div className="my-pets-p" key={pet.id}>
+              <div className="my-pets-p" key={pet._id}>
                 <h2 className="h-seet">Type: {pet.type}</h2>
                 <h2 className="h-seet">Name:{pet.name}</h2>
                 <img

@@ -42,9 +42,16 @@ function LoggedInApp({ isHomePage }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  console.log("isLoggedIn:", isLoggedIn);
+  console.log("userId:", userId);
+  console.log("location.pathname:", location.pathname);
 
   useEffect(() => {
-    if (location.pathname.includes("/admin") && userId !== "1") {
+    if (
+      location.pathname.includes("/admin") &&
+      userId !== "64c8f9c83dcab866023c1263"
+    ) {
+      console.log("Redirecting because userId is not admin:", userId);
       navigate("/");
     }
   }, [isLoggedIn, userId, navigate, location.pathname]);
@@ -69,7 +76,10 @@ function LoggedInApp({ isHomePage }) {
             </div>
             {menuOpen && (
               <>
-                {userId === "1" && <NavLink to="/admin">Admin</NavLink>}
+                {userId === "64c8f9c83dcab866023c1263" && (
+                  <NavLink to="/admin">Admin</NavLink>
+                )}
+
                 <NavLink to="/search">Search</NavLink>
                 <NavLink to="/">Home</NavLink>
                 {isLoggedIn && <NavLink to="/mypets">My Pets</NavLink>}
@@ -87,11 +97,15 @@ function LoggedInApp({ isHomePage }) {
           <Route
             path="/admin"
             element={
-              isLoggedIn && userId === "1" ? <AdminView /> : <Navigate to="/" />
+              isLoggedIn && userId === "64c8f9c83dcab866023c1263" ? (
+                <AdminView />
+              ) : (
+                <Navigate to="/" />
+              )
             }
           >
             <Route path="users" element={<UsersViewAdmin />} />
-            <Route path="users/:id" element={<UserDetailsViewAdmin />} />
+            <Route path="/admin/users/:id" element={<UserDetailsViewAdmin />} />
             <Route path="pets" element={<PetsViewAdmin />} />
             <Route path="add-pet" element={<AddPetForm />} />
             <Route path="edit-pet/:id" element={<EditPet />} />

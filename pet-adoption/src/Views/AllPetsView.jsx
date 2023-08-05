@@ -33,12 +33,17 @@ export const AllPetsView = () => {
               },
             }
           );
-          const savedPets = userResponse.data.savedPets;
+          const savedPets = userResponse.data.savedPets || [];
 
           newPets.forEach((pet) => {
-            pet.savedBy = pet.savedByUsers || [];
-            if (savedPets.includes(pet.id)) {
-              if (!pet.savedBy.includes(userId)) {
+            pet.savedBy = pet.savedByUsers ? [...pet.savedByUsers] : [];
+            console.log("savedPets:", savedPets);
+            if (
+              savedPets &&
+              Array.isArray(savedPets) &&
+              savedPets.includes(pet._id)
+            ) {
+              if (pet.savedBy && !pet.savedBy.includes(userId)) {
                 pet.savedBy.push(userId);
               }
             }
@@ -76,9 +81,10 @@ export const AllPetsView = () => {
         },
       });
       const savedPets = response.data.savedPets;
+      console.log("savedPets:", savedPets);
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          savedPets.includes(pet.id)
+          savedPets.includes(pet._id)
             ? {
                 ...pet,
                 savedBy: Array.isArray(pet.savedByUsers)
@@ -108,7 +114,7 @@ export const AllPetsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === petId
+          pet._id === petId
             ? {
                 ...pet,
                 savedBy: Array.isArray(pet.savedByUsers)
@@ -134,7 +140,7 @@ export const AllPetsView = () => {
       });
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === petId
+          pet._id === petId
             ? {
                 ...pet,
                 savedBy: Array.isArray(pet.savedByUsers)
@@ -164,7 +170,7 @@ export const AllPetsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === petId
+          pet._id === petId
             ? {
                 ...pet,
                 adoptionStatus: "Adopted",
@@ -193,7 +199,7 @@ export const AllPetsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === petId
+          pet._id === petId
             ? {
                 ...pet,
                 adoptionStatus: "Fostered",
@@ -222,11 +228,12 @@ export const AllPetsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === petId
+          pet._id === petId
             ? {
                 ...pet,
                 adoptionStatus: "Available",
                 ownerId: null,
+                error: null,
               }
             : pet
         );
@@ -234,6 +241,22 @@ export const AllPetsView = () => {
         return updatedPets;
       });
     } catch (error) {
+      if (error.response.status === 403) {
+        //check if error status is 403
+        setPets((oldPets) => {
+          const updatedPets = oldPets.map((pet) =>
+            pet._id === petId
+              ? {
+                  ...pet,
+                  error:
+                    "This pet is already adopted/fostered by someone, you can save it for later!",
+                }
+              : pet
+          );
+          localStorage.setItem("pets", JSON.stringify(updatedPets));
+          return updatedPets;
+        });
+      }
       console.error("Failed to return pet: ", error);
     }
   };
@@ -242,7 +265,7 @@ export const AllPetsView = () => {
     (pet) =>
       pet.name.toLowerCase().includes(search.toLowerCase()) ||
       pet.type.toLowerCase().includes(search.toLowerCase()) ||
-      pet.id.toString().includes(search)
+      pet._id.toString().includes(search)
   );
 
   const handleSearch = (event) => {
@@ -262,7 +285,7 @@ export const AllPetsView = () => {
       </div>
       <div className="all-pets-container">
         {filteredPets.map((pet) => (
-          <div className="pet-card" key={pet.id}>
+          <div className="pet-card" key={pet._id}>
             <img
               className="pet-image"
               src={
@@ -283,10 +306,11 @@ export const AllPetsView = () => {
               <p>Color: {pet.color}</p>
               <p>Hypoallergenic: {pet.hypoallergenic}</p>
               <p>Dietary Restrictions: {pet.dietaryRestrictions}</p>
+              {pet.error && <p className="error-message">{pet.error}</p>}
               {isLoggedIn && (
                 <>
                   <button className="button-details">
-                    <Link className="button-details1" to={`/mypets/${pet.id}`}>
+                    <Link className="button-details1" to={`/mypets/${pet._id}`}>
                       View Details
                     </Link>
                   </button>
@@ -294,7 +318,7 @@ export const AllPetsView = () => {
                   pet.adoptionStatus === "Fostered" ? (
                     <>
                       <button
-                        onClick={() => handleReturn(pet.id)}
+                        onClick={() => handleReturn(pet._id)}
                         className="button-details"
                       >
                         Return Pet
@@ -303,13 +327,13 @@ export const AllPetsView = () => {
                   ) : (
                     <>
                       <button
-                        onClick={() => handleAdopt(pet.id)}
+                        onClick={() => handleAdopt(pet._id)}
                         className="button-details"
                       >
                         Adopt
                       </button>
                       <button
-                        onClick={() => handleFoster(pet.id)}
+                        onClick={() => handleFoster(pet._id)}
                         className="button-details"
                       >
                         Foster
@@ -320,14 +344,14 @@ export const AllPetsView = () => {
                   {pet.savedBy && pet.savedBy.includes(userId) ? (
                     <button
                       className="button-details"
-                      onClick={() => handleUnsave(pet.id)}
+                      onClick={() => handleUnsave(pet._id)}
                     >
                       Unsave
                     </button>
                   ) : (
                     <button
                       className="button-details"
-                      onClick={() => handleSave(pet.id)}
+                      onClick={() => handleSave(pet._id)}
                     >
                       Save for Later
                     </button>

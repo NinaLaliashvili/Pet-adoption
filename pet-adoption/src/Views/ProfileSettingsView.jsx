@@ -15,7 +15,7 @@ export const ProfileSettingsView = () => {
   const [success, setSuccess] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const userId = parseInt(localStorage.getItem("userId"));
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     const apiUrl = `http://localhost:3070/user/${userId}`;
@@ -66,10 +66,10 @@ export const ProfileSettingsView = () => {
 
     const users = await axios.get("http://localhost:3070/users");
     const isEmailExists = users.data.some(
-      (user) => user.email === email && user.id !== userId
+      (user) => user.email === email && user._id !== userId
     );
     const isPhoneExists = users.data.some(
-      (user) => user.phone === phoneNumber && user.id !== userId
+      (user) => user.phone === phoneNumber && user._id !== userId
     );
 
     if (email && isEmailExists) {

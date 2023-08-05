@@ -27,10 +27,11 @@ export function Login() {
       console.log(response.data);
       if (response.data) {
         const { user, token } = response.data;
+        const userId = user._id;
 
         console.log(token);
         //update context and local storage
-        setLoginStatus(true, user.id, token);
+        setLoginStatus(true, userId, token);
 
         navigate("/");
       } else {

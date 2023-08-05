@@ -9,6 +9,7 @@ export const PetDetailsView = () => {
   const { isLoggedIn, userId, token } = useContext(LoginContext);
   const navigate = useNavigate();
   const { id } = useParams();
+  console.log("Pet ID:", id);
   const [petDetails, setPetDetails] = useState(null);
   const [pets, setPets] = useState(() => {
     const localPets = localStorage.getItem("pets");
@@ -56,7 +57,7 @@ export const PetDetailsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === id
+          pet._id === id
             ? {
                 ...pet,
                 savedBy: Array.isArray(pet.savedByUsers)
@@ -89,7 +90,7 @@ export const PetDetailsView = () => {
       });
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === id
+          pet._id === id
             ? {
                 ...pet,
                 savedBy: Array.isArray(pet.savedByUsers)
@@ -126,7 +127,7 @@ export const PetDetailsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === id
+          pet._id === id
             ? {
                 ...pet,
                 adoptionStatus: "Adopted",
@@ -160,7 +161,7 @@ export const PetDetailsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === id
+          pet._id === id
             ? {
                 ...pet,
                 adoptionStatus: "Fostered",
@@ -194,7 +195,7 @@ export const PetDetailsView = () => {
       );
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
-          pet.id === id
+          pet._id === id
             ? {
                 ...pet,
                 adoptionStatus: "Available",

@@ -21,7 +21,7 @@ export const Header = ({ isLoggedIn, handleLogout, setShowModal }) => {
       {isLoggedIn ? (
         <React.Fragment>
           <h1 className="welcome-heading-loggedin">
-            Welcome, {userFirstName} {userLastName}!
+            Welcome {userFirstName} {userLastName}!
           </h1>
           <button
             className="logout-button"

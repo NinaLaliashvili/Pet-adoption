@@ -40,7 +40,7 @@ export const SavedPetsView = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setSavedPets((oldPets) => oldPets.filter((pet) => pet.id !== petId));
+      setSavedPets((oldPets) => oldPets.filter((pet) => pet._id !== petId));
     } catch (error) {
       console.error("Failed to unsave pet: ", error);
     }
@@ -55,7 +55,7 @@ export const SavedPetsView = () => {
       <h1 className="h-seet">Saved Pets</h1>
       <div className="my-pets-box">
         {savedPets.map((pet) => (
-          <div className="my-pets-p" key={pet.id}>
+          <div className="my-pets-p" key={pet._id}>
             <h2 className="h-seet">{pet.name}</h2>
             <img
               className="p-imagee"
@@ -66,12 +66,12 @@ export const SavedPetsView = () => {
               }
               alt="Pet"
             />
-            <Link className="seedetails" to={`/mypets/${pet.id}`}>
+            <Link className="seedetails" to={`/mypets/${pet._id}`}>
               See details
             </Link>
             <button
               className="button-details"
-              onClick={() => handleUnsave(pet.id)}
+              onClick={() => handleUnsave(pet._id)}
             >
               Unsave
             </button>

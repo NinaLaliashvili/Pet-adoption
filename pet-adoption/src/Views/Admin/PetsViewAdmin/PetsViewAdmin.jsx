@@ -48,7 +48,7 @@ export const PetsViewAdmin = () => {
       <h2 className="users-admin-h2">Pets:</h2>
       <div className="users-section">
         {filteredPets.map((pet) => (
-          <div className="users-admin-div3 div4" key={pet.id}>
+          <div className="users-admin-div3 div4" key={pet._id}>
             <div className="img-flex">
               <img
                 className="admin-img"
@@ -61,10 +61,10 @@ export const PetsViewAdmin = () => {
               />
             </div>
             <div className="admin-flex">
-              <p className="users-admin-p">ID:{pet.id}</p>
+              <p className="users-admin-p">ID:{pet._id}</p>
               <p className="users-admin-p">Name:{pet.name}</p>
               <p className="users-admin-p">Type:{pet.type}</p>
-              <Link className="link-style" to={`/admin/edit-pet/${pet.id}`}>
+              <Link className="link-style" to={`/admin/edit-pet/${pet._id}`}>
                 Edit
               </Link>
             </div>

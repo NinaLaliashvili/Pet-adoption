@@ -3,24 +3,55 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const app = express();
+const path = require("path");
 const jwt = require("jsonwebtoken");
 const fs = require("fs").promises;
-const path = require("path");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const { ObjectId } = require("mongodb");
 
+const uri =
+  "mongodb+srv://nini:zzV7HL6hUcdeMQN9@pet-adoption.curklmr.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+let usersCollection;
+let petsCollection;
+
+async function run() {
+  try {
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
+    console.log("You successfully connected to MongoDB!");
+    usersCollection = client.db("usersandpets").collection("users");
+    petsCollection = client.db("usersandpets").collection("pets");
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+run().catch(console.dir);
+
+// app use implementation
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-//import db and connect with it
+// import db and connect with it
 const USERS_FILE = path.join(__dirname, "DB", "users.json");
 const PETS_FILE = path.join(__dirname, "DB", "pets.json");
 
-//middleware to authenticate token
+// middleware to authenticate token
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -54,69 +85,89 @@ app.get("/", (req, res) => {
   res.send("This is pet adoption project server");
 });
 
-// Get Users API - protected to admin
+//Get Users API - protected to admin
 app.get("/users", async (req, res) => {
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    console.log(JSON.stringify(users, null, 2));
+    const users = await usersCollection.find({}).toArray();
     res.json(users);
   } catch (error) {
-    console.error("Failed to read users.json", error);
+    console.error("Failed to get users", error);
     res.sendStatus(500);
   }
 });
 
-// Get User By ID API
+//Get User By ID API
 app.get("/user/:id", async (req, res) => {
-  const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-  const user = users.find((user) => user.id === parseInt(req.params.id));
+  console.log("Received ID:", req.params.id);
 
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(404).send("User not found.");
+  if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).send("Invalid ID format");
+  }
+
+  try {
+    const user = await usersCollection.findOne({
+      _id: new ObjectId(req.params.id),
+    });
+
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).send("User not found.");
+    }
+  } catch (error) {
+    console.error("Failed to get user", error);
+    res.sendStatus(500);
   }
 });
 
-// Update User API
+//Update User API
 app.put("/user/:id", authenticateToken, async (req, res) => {
-  const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-  const userIndex = users.findIndex(
-    (user) => user.id === parseInt(req.params.id)
-  );
+  try {
+    const userId = new ObjectId(req.params.id);
 
-  if (userIndex === -1) {
-    res.status(404).send("User not found.");
-  } else {
-    //see if authenticated user is the same as the user
-    if (req.user.id !== users[userIndex].id) {
+    const existingUser = await usersCollection.findOne({ _id: userId });
+    if (!existingUser) {
+      return res.status(404).send("User not found.");
+    }
+
+    if (req.user.id !== userId.toString()) {
       return res
         .status(403)
         .send("You do not have permission to update this profile.");
     }
 
-    let updatedUser = { ...users[userIndex], ...req.body };
+    let updatedUser = { ...existingUser, ...req.body };
 
-    //see if password exists in req.body. If it does, hash the new password.
     if (req.body.password) {
       const saltRounds = 10;
       updatedUser.password = await bcrypt.hash(req.body.password, saltRounds);
     }
 
-    users[userIndex] = updatedUser;
+    await usersCollection.updateOne({ _id: userId }, { $set: updatedUser });
 
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
-
-    //return user without password
     const { password: _, ...userWithoutPassword } = updatedUser;
     res.json(userWithoutPassword);
+  } catch (error) {
+    console.error("Failed to update user", error);
+    res.sendStatus(500);
   }
 });
 
 //post users to sign up, after that new user will be visible into db
 app.post("/signup", async (req, res) => {
-  const { email, password, confirmPassword, firstName, lastName, phone } =
-    req.body;
+  const {
+    email,
+    password,
+    confirmPassword,
+    firstName,
+    lastName,
+    phone,
+    bio = "Hello there <3",
+    savedPets = [],
+    ownedPets = [],
+    fosteredPets = [],
+    pets = [],
+  } = req.body;
 
   //check if any of the fields are empty, if they are, there is an err
   if (
@@ -158,10 +209,9 @@ app.post("/signup", async (req, res) => {
   }
   //checking if email or phone already exists
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const existingUser = users.find(
-      (user) => user.email === email || user.phone === phone
-    );
+    const existingUser = await usersCollection.findOne({
+      $or: [{ email }, { phone }],
+    });
 
     if (existingUser) {
       return res.status(400).send("Email or phone number already exists.");
@@ -170,18 +220,21 @@ app.post("/signup", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const user = {
-      id: users.length + 1,
       email,
       password: hashedPassword,
       firstName,
       lastName,
       phone,
+      bio,
+      savedPets,
+      ownedPets,
+      fosteredPets,
+      pets,
     };
 
-    users.push(user);
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+    const result = await usersCollection.insertOne(user);
 
-    res.status(201).json({ userId: user.id });
+    res.status(201).json({ userId: result.insertedId });
   } catch (error) {
     console.error(error);
     res.status(500).send("Something went wrong. Please try again later.");
@@ -198,35 +251,29 @@ app.post("/login", async (req, res) => {
   }
 
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const user = users.find((user) => user.email === email);
+    const user = await usersCollection.findOne({ email });
 
-    //if the user is not the same as email, error:
     if (!user) {
       return res.status(400).send("User does not exist.");
     }
 
-    //if the password is not matching
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
       return res.status(400).send("Incorrect password.");
     }
 
-    //this is generating JWT
     const token = jwt.sign(
-      { id: user.id, isAdmin: user.isAdmin },
+      { id: user._id.toString(), isAdmin: user.isAdmin },
       "somesecretkey",
       {
         expiresIn: "48h",
       }
     );
 
-    //remove the password from the user object before sending it back
     const { password: _, ...userWithoutPassword } = user;
 
-    //return the user's information (without the password) and the JWT
-    res.json({ user: userWithoutPassword, token });
+    res.json({ userId: user._id.toString(), user: userWithoutPassword, token });
   } catch (error) {
     console.error(error);
     res.status(500).send("Something went wrong. Please try again later.");
@@ -235,49 +282,26 @@ app.post("/login", async (req, res) => {
 
 // ======================== pets get and post ===========================//
 
-// Get Pets API
+//Get Pets API
 app.get("/pet", async (req, res) => {
-  console.log(req.query);
   const { type, name, adoptionStatus, minHeight, maxHeight, weight } =
     req.query;
 
   try {
-    let pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
+    // Build query based on filters
+    const query = {};
+    if (adoptionStatus) query.adoptionStatus = adoptionStatus;
+    if (type) query.type = new RegExp(type, "i");
+    if (name) query.name = new RegExp(name, "i");
+    if (minHeight || maxHeight)
+      query.height = { $gte: Number(minHeight), $lte: Number(maxHeight) };
+    if (weight) query.weight = Number(weight);
 
-    if (adoptionStatus) {
-      pets = pets.filter(
-        (pet) =>
-          pet.adoptionStatus.toLowerCase() === adoptionStatus.toLowerCase()
-      );
-    }
-    if (type) {
-      pets = pets.filter((pet) =>
-        pet.type.toLowerCase().includes(type.toLowerCase())
-      );
-    }
-    if (minHeight || maxHeight) {
-      pets = pets.filter((pet) => {
-        if (minHeight && pet.height < Number(minHeight)) {
-          return false;
-        }
-        if (maxHeight && pet.height > Number(maxHeight)) {
-          return false;
-        }
-        return true;
-      });
-    }
-    if (weight) {
-      pets = pets.filter((pet) => pet.weight === Number(weight));
-    }
-    if (name) {
-      pets = pets.filter((pet) =>
-        pet.name.toLowerCase().includes(name.toLowerCase())
-      );
-    }
+    const pets = await petsCollection.find(query).toArray();
 
     res.json(pets);
   } catch (error) {
-    console.error("Failed to read pets.json", error);
+    console.error("Failed to get pets", error);
     res.sendStatus(500);
   }
 });
@@ -286,9 +310,12 @@ app.get("/pet", async (req, res) => {
 app.get("/pet/:id", async (req, res) => {
   const { id } = req.params;
 
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).send("Invalid ID format");
+  }
+
   try {
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-    const pet = pets.find((pet) => pet.id === parseInt(id));
+    const pet = await petsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!pet) {
       return res.status(404).send("Pet not found");
@@ -296,7 +323,7 @@ app.get("/pet/:id", async (req, res) => {
 
     res.json(pet);
   } catch (error) {
-    console.error("Failed to read pets.json", error);
+    console.error("Failed to get pet", error);
     res.sendStatus(500);
   }
 });
@@ -317,10 +344,7 @@ app.post("/pet", upload.single("image"), async (req, res) => {
   } = req.body;
 
   try {
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
     const pet = {
-      id: pets.length + 1,
       type,
       name,
       adoptionStatus,
@@ -334,8 +358,8 @@ app.post("/pet", upload.single("image"), async (req, res) => {
       dietaryRestrictions,
     };
 
-    pets.push(pet);
-    await fs.writeFile(PETS_FILE, JSON.stringify(pets, null, 2));
+    const result = await petsCollection.insertOne(pet);
+    pet._id = result.insertedId;
 
     res.status(201).json(pet);
   } catch (error) {
@@ -347,6 +371,11 @@ app.post("/pet", upload.single("image"), async (req, res) => {
 //Edit Pet API - protected to admin only
 app.put("/pet/:id", upload.single("image"), async (req, res) => {
   const { id } = req.params;
+
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).send("Invalid ID format");
+  }
+
   const {
     type,
     name,
@@ -361,22 +390,20 @@ app.put("/pet/:id", upload.single("image"), async (req, res) => {
   } = req.body;
 
   try {
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
+    const pet = await petsCollection.findOne({ _id: new ObjectId(id) });
 
-    const petIndex = pets.findIndex((pet) => pet.id.toString() === id);
-
-    if (petIndex === -1) {
+    if (!pet) {
       return res.status(404).send("Pet not found");
     }
 
     const updatedPet = {
-      ...pets[petIndex],
+      ...pet,
       type,
       name,
       adoptionStatus,
       weight,
       height,
-      imagePath: req.file ? req.file.path : pets[petIndex].imagePath,
+      imagePath: req.file ? req.file.path : pet.imagePath,
       color,
       age,
       breed,
@@ -384,9 +411,7 @@ app.put("/pet/:id", upload.single("image"), async (req, res) => {
       dietaryRestrictions,
     };
 
-    pets[petIndex] = updatedPet;
-
-    await fs.writeFile(PETS_FILE, JSON.stringify(pets, null, 2));
+    await petsCollection.replaceOne({ _id: new ObjectId(id) }, updatedPet);
 
     res.status(200).json(updatedPet);
   } catch (error) {
@@ -397,31 +422,27 @@ app.put("/pet/:id", upload.single("image"), async (req, res) => {
 
 //Save Pet API
 app.post("/pet/:id/save", authenticateToken, async (req, res) => {
-  const petId = parseInt(req.params.id);
+  const petId = new ObjectId(req.params.id);
+  const userId = new ObjectId(req.user.id);
 
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
-    const user = users.find((user) => user.id === req.user.id);
-    const pet = pets.find((pet) => pet.id === petId);
+    const pet = await petsCollection.findOne({ _id: petId });
+    const user = await usersCollection.findOne({ _id: userId });
 
     if (!user || !pet) {
       return res.status(404).send("User or Pet not found");
     }
 
-    //to move the pet to the user's saved pets if it's not already there
     if (!user.savedPets.includes(petId)) {
-      user.savedPets.push(petId);
-      //add the user to the pet's savedByUsers array
-      pet.savedByUsers = pet.savedByUsers || [];
-      if (!pet.savedByUsers.includes(user.id)) {
-        pet.savedByUsers.push(user.id);
-      }
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $push: { savedPets: petId } }
+      );
+      await petsCollection.updateOne(
+        { _id: pet._id },
+        { $push: { savedByUsers: userId } }
+      );
     }
-
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-    await fs.writeFile(PETS_FILE, JSON.stringify(pets, null, 2));
 
     res.json({ user: user, pet: pet });
   } catch (error) {
@@ -432,28 +453,25 @@ app.post("/pet/:id/save", authenticateToken, async (req, res) => {
 
 //delete saved pet API
 app.delete("/pet/:id/save", authenticateToken, async (req, res) => {
-  const petId = parseInt(req.params.id);
+  const petId = new ObjectId(req.params.id);
+  const userId = new ObjectId(req.user.id);
 
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
-    const user = users.find((user) => user.id === req.user.id);
-    const pet = pets.find((pet) => pet.id === petId);
+    const pet = await petsCollection.findOne({ _id: petId });
+    const user = await usersCollection.findOne({ _id: userId });
 
     if (!user || !pet) {
       return res.status(404).send("User or Pet not found");
     }
 
-    //remove the pet from the user's saved pets
-    user.savedPets = user.savedPets.filter((id) => id !== petId);
-
-    //remove the user from the pet's savedByUsers array
-    pet.savedByUsers = pet.savedByUsers || [];
-    pet.savedByUsers = pet.savedByUsers.filter((id) => id !== user.id);
-
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-    await fs.writeFile(PETS_FILE, JSON.stringify(pets, null, 2));
+    await usersCollection.updateOne(
+      { _id: user._id },
+      { $pull: { savedPets: petId } }
+    );
+    await petsCollection.updateOne(
+      { _id: pet._id },
+      { $pull: { savedByUsers: userId } }
+    );
 
     res.json({ user: user, pet: pet });
   } catch (error) {
@@ -464,27 +482,24 @@ app.delete("/pet/:id/save", authenticateToken, async (req, res) => {
 
 //get User Saved Pets API
 app.get("/user/:id/savedPets", authenticateToken, async (req, res) => {
-  const userId = parseInt(req.params.id);
+  const userId = new ObjectId(req.user.id);
 
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
-    const user = users.find((user) => user.id === userId);
-
+    const user = await usersCollection.findOne({ _id: userId });
     if (!user) {
       return res.status(404).send("User not found");
     }
 
-    //see if authenticated user is the same as the user whose saved pets are being fetched
-    if (req.user.id !== user.id) {
+    if (userId.toString() !== req.user.id) {
+      // compare with toString()
       return res
         .status(403)
         .send("You do not have permission to view this data.");
     }
 
-    //detch the user's saved pets from the pets data
-    const savedPets = pets.filter((pet) => user.savedPets.includes(pet.id));
+    const savedPets = await petsCollection
+      .find({ _id: { $in: user.savedPets } })
+      .toArray();
 
     res.json(savedPets);
   } catch (error) {
@@ -495,31 +510,37 @@ app.get("/user/:id/savedPets", authenticateToken, async (req, res) => {
 
 //Adopt/Foster Pet API
 app.post("/pet/:id/adopt", authenticateToken, async (req, res) => {
-  const petId = parseInt(req.params.id);
-  const userId = req.user.id;
+  const petId = new ObjectId(req.params.id);
+  const userId = new ObjectId(req.user.id);
+  const isFostering = req.body.isFostering;
 
   try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
-    const user = users.find((user) => user.id === userId);
-    const pet = pets.find((pet) => pet.id === petId);
+    //retrieve pet and user from MongoDB collections
+    const pet = await petsCollection.findOne({ _id: petId });
+    const user = await usersCollection.findOne({ _id: userId });
 
     if (!pet || !user) {
       return res.status(404).send("Pet or User not found");
     }
 
-    const isFostering = req.body.isFostering;
+    const adoptionStatus = isFostering ? "Fostered" : "Adopted";
+    await petsCollection.updateOne(
+      { _id: petId },
+      {
+        $set: {
+          adoptionStatus,
+          ownedByUser: userId,
+        },
+      }
+    );
 
-    //to xhange pet's status and owner
-    pet.adoptionStatus = isFostering ? "Fostered" : "Adopted";
-    pet.ownedByUser = user.id;
-
-    //to add pet to user's pets
-    user.pets = [...(user.pets || []), petId];
-
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
-    await fs.writeFile(PETS_FILE, JSON.stringify(pets, null, 2), "utf8");
+    //add pet to user's pets
+    await usersCollection.updateOne(
+      { _id: userId },
+      {
+        $push: { pets: petId },
+      }
+    );
 
     res.status(200).send("Pet has been successfully adopted/fostered");
   } catch (error) {
@@ -530,36 +551,40 @@ app.post("/pet/:id/adopt", authenticateToken, async (req, res) => {
 
 //Return Pet API
 app.post("/pet/:id/return", authenticateToken, async (req, res) => {
-  const petId = parseInt(req.params.id);
-  const userId = req.user.id;
+  const petId = new ObjectId(req.params.id);
+  const userId = new ObjectId(req.user.id);
 
   try {
-    //get the user and pet data
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
-    const user = users.find((user) => user.id === userId);
-    const pet = pets.find((pet) => pet.id === petId);
+    const pet = await petsCollection.findOne({ _id: petId });
+    const user = await usersCollection.findOne({ _id: userId });
 
     if (!pet || !user) {
       return res.status(404).send("Pet or User not found");
     }
 
     //verify if the pet is owned by the user
-    if (pet.ownedByUser !== user.id) {
+    if (pet.ownedByUser.toString() !== userId.toString()) {
       return res.status(403).send("You can't return a pet you don't own.");
     }
 
     //change pet's status and owner
-    pet.adoptionStatus = "Available";
-    pet.ownedByUser = null;
+    await petsCollection.updateOne(
+      { _id: petId },
+      {
+        $set: {
+          adoptionStatus: "Available",
+          ownedByUser: null,
+        },
+      }
+    );
 
     //remove pet from user's pets
-    user.pets = user.pets.filter((id) => id !== petId);
-
-    //save changes to files
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
-    await fs.writeFile(PETS_FILE, JSON.stringify(pets, null, 2), "utf8");
+    await usersCollection.updateOne(
+      { _id: userId },
+      {
+        $pull: { pets: petId },
+      }
+    );
 
     res.status(200).send("Pet has been successfully returned");
   } catch (error) {
@@ -570,14 +595,10 @@ app.post("/pet/:id/return", authenticateToken, async (req, res) => {
 
 //get Pets By User ID API
 app.get("/user/:id/pets", authenticateToken, async (req, res) => {
-  const userId = parseInt(req.params.id);
+  const userId = new ObjectId(req.user.id);
 
   try {
-    //get the user and pet data
-    const users = JSON.parse(await fs.readFile(USERS_FILE, "utf8"));
-    const pets = JSON.parse(await fs.readFile(PETS_FILE, "utf8"));
-
-    const user = users.find((user) => user.id === userId);
+    const user = await usersCollection.findOne({ _id: userId });
 
     if (!user) {
       console.log("User not found for ID:", userId);
@@ -585,17 +606,19 @@ app.get("/user/:id/pets", authenticateToken, async (req, res) => {
     }
 
     //check if authenticated user is the same as the user whose pets are being fetched, or if the authenticated user is an admin
-    if (req.user.id == req.user.isAdmin) {
+    if (userId.toString() !== req.user.id && !req.user.isAdmin) {
+      //comparing with string representation
       console.log("Authentication mismatch for user ID:", userId);
       return res
         .status(403)
         .send("You do not have permission to view this data.");
     }
 
-    //fetch the user's pets from the pets data
-    const userPets = pets.filter(
-      (pet) => pet.ownedByUser === user.id || pet.fosteredByUser === user.id
-    );
+    //fetch the user's pets from the MongoDB collection
+    const userPets = await petsCollection
+      .find({ ownedByUser: userId })
+      .toArray();
+
     console.log("User Pets:", userPets);
     res.json(userPets);
   } catch (error) {

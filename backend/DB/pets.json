@@ -2,7 +2,7 @@
   {
     "type": "Dog",
     "name": "Shy",
-    "adoptionStatus": "Adopted",
+    "adoptionStatus": "Available",
     "weight": "3",
     "height": "12",
     "imagePath": "uploads/9a5f65891430aff4ec8bdffbe8f0aafb",
@@ -11,15 +11,15 @@
     "breed": "Bulldog",
     "hypoallergenic": "No",
     "dietaryRestrictions": "Senior pet - easy-to-chew kibble required. No large-sized or hard kibble.",
-    "id": 5,
+    "id": 1,
     "savedByUsers": [],
-    "ownedByUser": 2,
+    "ownedByUser": null,
     "fosteredByUser": null
   },
   {
     "type": "Capybara",
     "name": "Love",
-    "adoptionStatus": "Adopted",
+    "adoptionStatus": "Available",
     "weight": "1",
     "height": "4",
     "imagePath": "uploads/ab882772fb66f383eb83fb2346e9faed",
@@ -28,14 +28,14 @@
     "breed": "Capybara",
     "hypoallergenic": "Yes",
     "dietaryRestrictions": "Avoid artificial preservatives, colors, and flavors. Natural and organic options preferred.",
-    "id": 6,
+    "id": 2,
     "savedByUsers": [],
-    "ownedByUser": 2,
+    "ownedByUser": null,
     "fosteredByUser": null
   },
   {
     "type": "Cat",
-    "name": "Bastet",
+    "name": "Kira",
     "adoptionStatus": "Available",
     "weight": "2",
     "height": "12",
@@ -45,7 +45,7 @@
     "breed": "Siamese",
     "hypoallergenic": "No",
     "dietaryRestrictions": "Veterinary-prescribed diet - Royal Canin Urinary SO. No other food or treats allowed.",
-    "id": 7,
+    "id": 3,
     "savedByUsers": [],
     "ownedByUser": null,
     "fosteredByUser": null
@@ -62,7 +62,7 @@
     "breed": "Rottweiler",
     "hypoallergenic": "Yes",
     "dietaryRestrictions": "Veterinary-prescribed diet - Royal Canin Urinary SO. No other food or treats allowed.",
-    "id": 8,
+    "id": 4,
     "savedByUsers": [],
     "ownedByUser": null,
     "fosteredByUser": null
@@ -79,7 +79,7 @@
     "breed": "Guinea pig",
     "hypoallergenic": "Yes",
     "dietaryRestrictions": "Avoid artificial preservatives, colors, and flavors. Natural and organic options preferred.",
-    "id": 9,
+    "id": 5,
     "savedByUsers": [],
     "ownedByUser": null,
     "fosteredByUser": null
@@ -96,7 +96,7 @@
     "breed": "Pudell",
     "hypoallergenic": "Yes",
     "dietaryRestrictions": "Diabetes - no added sugars. Please provide diabetic-friendly food options",
-    "id": 10,
+    "id": 6,
     "savedByUsers": [],
     "ownedByUser": null,
     "fosteredByUser": null
@@ -113,9 +113,39 @@
     "breed": "Cocker Spaniel",
     "hypoallergenic": "False",
     "dietaryRestrictions": "Prescription Diets: In some cases, veterinarians may prescribe special diets tailored to specific medical conditions such as kidney disease, liver disease, heart issues, or urinary problems.",
-    "id": 11,
+    "id": 7,
     "savedByUsers": [],
     "ownedByUser": null,
     "fosteredByUser": null
+  },
+  {
+    "id": 8,
+    "type": "Dog",
+    "name": "Doggo",
+    "adoptionStatus": "Available",
+    "weight": "8",
+    "height": "8",
+    "imagePath": "uploads/11f680bd6fa935cf4554305374e5f399",
+    "color": "Brown",
+    "age": "1",
+    "breed": "Gof",
+    "hypoallergenic": "No",
+    "dietaryRestrictions": "Allergic to chicken and grains. Please avoid any food or treats containing these ingredients.",
+    "savedByUsers": []
+  },
+  {
+    "id": 9,
+    "type": "Cat",
+    "name": "Bastet",
+    "adoptionStatus": "Available",
+    "weight": "2",
+    "height": "4",
+    "imagePath": "uploads/ff001b037b19dbeeb7d2f812fec64208",
+    "color": "Dark brown",
+    "age": "1",
+    "breed": "Without Breed",
+    "hypoallergenic": "Yes",
+    "dietaryRestrictions": "Avoid artificial preservatives, colors, and flavors. Natural and organic options preferred.",
+    "ownedByUser": null
   }
 ]

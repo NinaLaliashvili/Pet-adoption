@@ -45,7 +45,7 @@ export const MyPetsView = () => {
           </p>
         ) : (
           myPets.map((pet) => (
-            <div className="my-pets-p" key={pet.id}>
+            <div className="my-pets-p" key={pet._id}>
               <h2 className="h-seet">{pet.name}</h2>
               <img
                 className="p-imagee"
@@ -57,7 +57,7 @@ export const MyPetsView = () => {
                 alt="Pet"
               />
               <p className="h-seet">Status: {pet.adoptionStatus}</p>
-              <Link className="seedetails" to={`/mypets/${pet.id}`}>
+              <Link className="seedetails" to={`/mypets/${pet._id}`}>
                 See details
               </Link>
             </div>

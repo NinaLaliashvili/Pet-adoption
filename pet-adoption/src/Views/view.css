@@ -409,7 +409,6 @@ h2 {
   margin-top: 20px;
 }
 
-/* font-family: "Kalam", cursive;font-family: "Kalam", cursive;font-family: "Kalam", cursive;font-family: "Kalam", cursive;font-family: "Kalam", cursive; */
 .pet-details {
   padding: 10px;
   font-family: "Kalam", cursive;
@@ -542,4 +541,11 @@ h2 {
 .button-details:disabled {
   background-color: grey;
   cursor: not-allowed;
+}
+.error-message {
+  color: red;
+  font-weight: bold;
+  font-style: italic;
+  margin: 10px 0px;
+  background-color: #ffe6e6;
 }

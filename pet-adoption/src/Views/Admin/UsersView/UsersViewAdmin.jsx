@@ -44,8 +44,8 @@ export const UsersViewAdmin = () => {
       <h2 className="users-admin-h2">Users:</h2>
       <div className="users-section">
         {filteredUsers.map((user) => (
-          <div className="users-admin-div3" key={user.id}>
-            <Link className="text-decoration" to={`/admin/users/${user.id}`}>
+          <div className="users-admin-div3" key={user._id}>
+            <Link className="text-decoration" to={`/admin/users/${user._id}`}>
               <p className="users-admin-p">
                 {user.firstName} {user.lastName}
               </p>

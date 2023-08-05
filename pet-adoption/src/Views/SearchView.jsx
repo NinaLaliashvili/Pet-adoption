@@ -43,7 +43,7 @@ export const SearchView = () => {
       <div className="results-container">
         {results.length > 0
           ? results.map((result) => (
-              <div key={result.id} className="animal-card">
+              <div key={result._id} className="animal-card">
                 <h2 className="h-set2 ">Type:{result.type}</h2>
                 <h2 className="h-set2 ">Name: {result.name}</h2>
                 <img
@@ -59,7 +59,7 @@ export const SearchView = () => {
                   }
                   alt="Pet"
                 />
-                <Link to={`/mypets/${result.id}`}>
+                <Link to={`/mypets/${result._id}`}>
                   <button className="see-more-button">See more</button>
                 </Link>
               </div>

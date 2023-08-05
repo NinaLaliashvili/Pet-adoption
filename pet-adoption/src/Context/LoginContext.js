@@ -10,7 +10,7 @@ export const LoginProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   const setLoginStatus = (loginStatus, userId, token) => {
-    localStorage.setItem("isLoggedIn", loginStatus);
+    localStorage.setItem("isLoggedIn", loginStatus.toString());
     localStorage.setItem("userId", userId);
     localStorage.setItem("token", token);
     setIsLoggedIn(loginStatus);
