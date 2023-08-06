@@ -32,6 +32,8 @@ export function Login() {
         console.log(token);
         //update context and local storage
         setLoginStatus(true, userId, token);
+        localStorage.setItem("firstName", user.firstName);
+        localStorage.setItem("lastName", user.lastName);
 
         navigate("/");
       } else {

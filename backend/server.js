@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
@@ -9,12 +10,10 @@ const fs = require("fs").promises;
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const nodemailer = require("nodemailer");
-require("dotenv").config();
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const { ObjectId } = require("mongodb");
 
-const uri =
-  "mongodb+srv://nini:zzV7HL6hUcdeMQN9@pet-adoption.curklmr.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -61,7 +60,7 @@ function authenticateToken(req, res, next) {
     return res.sendStatus(401);
   }
 
-  jwt.verify(token, "somesecretkey", (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
       console.log("Error during token verification:", err);
       return res.sendStatus(403);
@@ -265,7 +264,7 @@ app.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id.toString(), isAdmin: user.isAdmin },
-      "somesecretkey",
+      process.env.JWT_SECRET,
       {
         expiresIn: "48h",
       }
@@ -595,7 +594,7 @@ app.post("/pet/:id/return", authenticateToken, async (req, res) => {
 
 //get Pets By User ID API
 app.get("/user/:id/pets", authenticateToken, async (req, res) => {
-  const userId = new ObjectId(req.user.id);
+  const userId = new ObjectId(req.params.id);
 
   try {
     const user = await usersCollection.findOne({ _id: userId });

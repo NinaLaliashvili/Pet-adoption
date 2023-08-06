@@ -14,7 +14,7 @@ export const Header = ({ isLoggedIn, handleLogout, setShowModal }) => {
 
     setUserFirstName(firstName);
     setUserLastName(lastName);
-  }, [localStorage.getItem("firstName"), localStorage.getItem("lastName")]);
+  }, [isLoggedIn]);
 
   return (
     <div className="header">
