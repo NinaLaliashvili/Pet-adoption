@@ -29,7 +29,6 @@ export function Login() {
         const { user, token } = response.data;
         const userId = user._id;
 
-        console.log(token);
         //update context and local storage
         setLoginStatus(true, userId, token);
         localStorage.setItem("firstName", user.firstName);

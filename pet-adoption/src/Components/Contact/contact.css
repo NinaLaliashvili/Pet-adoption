@@ -1,0 +1,70 @@
+.forrm-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 50px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #f8f9fa;
+}
+
+.forrm-input,
+.forrm-textarea {
+  width: 100%;
+  padding: 10px 10px;
+  font-size: 18px;
+  border-radius: 7px;
+  border: 2px solid #ced4da;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.forrm-input:focus,
+.forrm-textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.25);
+}
+
+.forrm-textarea {
+  height: 150px;
+  resize: none;
+}
+
+.forrm-button {
+  padding: 10px 20px;
+  border-radius: 7px;
+  background-color: #007bff;
+  font-size: 18px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.forrm-button:hover {
+  background-color: #0056b3;
+}
+
+.forrm-button:active {
+  background-color: #004085;
+}
+
+.status-message {
+  margin-top: 30px;
+  font-size: 18px;
+}
+
+.status-success {
+  color: green;
+  font-weight: 600;
+  font-size: large;
+}
+
+.status-error {
+  color: red;
+  font-weight: 600;
+  font-size: large;
+}

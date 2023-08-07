@@ -36,9 +36,9 @@ export const BodyHome = forwardRef(
             Our passionate team of pet matchmakers possesses an uncanny ability
             to find the ideal companion for your soul. They understand the
             unique bond between humans and animals, ensuring a magical
-            connection between you and your new friend. Prepare to be captivated
-            by their vibrant personalities and choose from mischievous kittens,
-            playful puppies, and wise old souls. 🌈🌠
+            connection between you and your new friend. If you have any
+            questions, don't be shy, <Link to="/contact">contact us!</Link>!
+            🌈🌠
           </p>
         </div>
         <div className="photo-section">

@@ -37,7 +37,7 @@ export const AllPetsView = () => {
 
           newPets.forEach((pet) => {
             pet.savedBy = pet.savedByUsers ? [...pet.savedByUsers] : [];
-            console.log("savedPets:", savedPets);
+
             if (
               savedPets &&
               Array.isArray(savedPets) &&
@@ -81,7 +81,7 @@ export const AllPetsView = () => {
         },
       });
       const savedPets = response.data.savedPets;
-      console.log("savedPets:", savedPets);
+
       setPets((oldPets) => {
         const updatedPets = oldPets.map((pet) =>
           savedPets.includes(pet._id)

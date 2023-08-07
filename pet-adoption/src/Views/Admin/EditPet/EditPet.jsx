@@ -30,7 +30,6 @@ export const EditPet = () => {
   const fetchPet = async () => {
     try {
       const response = await axios.get(`http://localhost:3070/pet/${id}`);
-      console.log("Fetched pet: ", response.data);
       setPet(response.data);
     } catch (error) {
       console.error("Failed to fetch pet: ", error);

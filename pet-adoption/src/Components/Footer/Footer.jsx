@@ -5,15 +5,21 @@ import inLogo from "./Logo/insta.svg";
 import whLogo from "./Logo/what.png";
 import gitLogo from "./Logo/github.png";
 import linkLogo from "./Logo/linkedin.png";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-content">
-        <h3 className="h3footer">- ITC </h3>
+        <h3 className="h3footer">© 2023 - ITC </h3>
         <br />
         <h4 className="h4footer"> - Pet Adoption Project</h4>
-        <p className="pfooter">Contact us:</p>
+        <p className="pfooter">
+          <Link className="pfooter" to="/contact">
+            {" "}
+            Contact us!
+          </Link>
+        </p>
         <ul className="social-linksfooter">
           <li className="li-dot">
             <a

@@ -9,7 +9,6 @@ export const PetDetailsView = () => {
   const { isLoggedIn, userId, token } = useContext(LoginContext);
   const navigate = useNavigate();
   const { id } = useParams();
-  console.log("Pet ID:", id);
   const [petDetails, setPetDetails] = useState(null);
   const [pets, setPets] = useState(() => {
     const localPets = localStorage.getItem("pets");

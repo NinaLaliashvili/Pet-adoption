@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const app = express();
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const fs = require("fs").promises;
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const nodemailer = require("nodemailer");
@@ -46,10 +45,6 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-// import db and connect with it
-const USERS_FILE = path.join(__dirname, "DB", "users.json");
-const PETS_FILE = path.join(__dirname, "DB", "pets.json");
-
 // middleware to authenticate token
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -70,14 +65,6 @@ function authenticateToken(req, res, next) {
   });
 }
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USERNAME,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
-
 // -------------------------- Start Server Side----------------------------
 //general api route
 app.get("/", (req, res) => {
@@ -97,8 +84,6 @@ app.get("/users", async (req, res) => {
 
 //Get User By ID API
 app.get("/user/:id", async (req, res) => {
-  console.log("Received ID:", req.params.id);
-
   if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).send("Invalid ID format");
   }
@@ -592,7 +577,7 @@ app.post("/pet/:id/return", authenticateToken, async (req, res) => {
   }
 });
 
-//get Pets By User ID API
+//======================== get Pets By User ID API ==========================
 app.get("/user/:id/pets", authenticateToken, async (req, res) => {
   const userId = new ObjectId(req.params.id);
 
@@ -600,7 +585,6 @@ app.get("/user/:id/pets", authenticateToken, async (req, res) => {
     const user = await usersCollection.findOne({ _id: userId });
 
     if (!user) {
-      console.log("User not found for ID:", userId);
       return res.status(404).send("User not found");
     }
 
@@ -617,13 +601,52 @@ app.get("/user/:id/pets", authenticateToken, async (req, res) => {
     const userPets = await petsCollection
       .find({ ownedByUser: userId })
       .toArray();
-
-    console.log("User Pets:", userPets);
     res.json(userPets);
   } catch (error) {
     console.error(error);
     res.status(500).send("Something went wrong. Please try again later.");
   }
+});
+
+// ========================== implement sending email =======================
+app.post("/send-email", async (req, res) => {
+  const { name, email, phone, message } = req.body;
+
+  //mandatory fields
+  if (!name || !email || !message) {
+    return res
+      .status(400)
+      .send("Name, Email, and Message are required fields.");
+  }
+
+  //transporter object using the default smtp transport
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  //email data
+  let mailOptions = {
+    from: `"${name}" <${email}>`,
+    to: process.env.EMAIL_USER,
+    subject: `New message from ${name}`,
+    text: `From: ${name}\nEmail: ${email}\n Phone: ${phone}\n\n${message}`,
+    html: `<b>From:</b> ${name}<br><b>Email:</b> ${email}<br><b>Phone:</b> ${
+      phone || "N/A"
+    }<br><br><b>Message:</b> ${message}`,
+  };
+
+  //send the email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email:", error);
+      return res.status(500).send("Failed to send the email.");
+    }
+    res.status(200).send("Email sent successfully!");
+  });
 });
 
 const port = 3070;

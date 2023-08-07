@@ -25,6 +25,7 @@ import { EditPet } from "./Views/Admin/EditPet/EditPet";
 import { PetsView } from "./Views/PetsView";
 import { UserDetailsViewAdmin } from "./Views/Admin/UsersView/UserDetailsViewAdmin";
 import { useNavigate } from "react-router-dom";
+import Contact from "./Components/Contact/Contact";
 
 function App() {
   const location = useLocation();
@@ -42,16 +43,12 @@ function LoggedInApp({ isHomePage }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  console.log("isLoggedIn:", isLoggedIn);
-  console.log("userId:", userId);
-  console.log("location.pathname:", location.pathname);
 
   useEffect(() => {
     if (
       location.pathname.includes("/admin") &&
       userId !== "64c8f9c83dcab866023c1263"
     ) {
-      console.log("Redirecting because userId is not admin:", userId);
       navigate("/");
     }
   }, [isLoggedIn, userId, navigate, location.pathname]);
@@ -80,6 +77,7 @@ function LoggedInApp({ isHomePage }) {
                   <NavLink to="/admin">Admin</NavLink>
                 )}
 
+                {isLoggedIn && <NavLink to="/contact">Contact</NavLink>}
                 <NavLink to="/search">Search</NavLink>
                 <NavLink to="/">Home</NavLink>
                 {isLoggedIn && <NavLink to="/mypets">My Pets</NavLink>}
@@ -119,6 +117,7 @@ function LoggedInApp({ isHomePage }) {
           <Route path="/mypets/:id" element={<PetDetailsView />} />
           <Route path="/mypets" element={<PetsView />} />
           <Route path="/allpets" element={<AllPetsView />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </div>
     </div>

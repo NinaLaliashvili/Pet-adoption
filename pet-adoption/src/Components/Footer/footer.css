@@ -13,7 +13,9 @@
 .pfooter {
   margin: 0;
 }
-
+.pfooter {
+  color: white;
+}
 .social-linksfooter {
   display: flex;
   list-style: none;
