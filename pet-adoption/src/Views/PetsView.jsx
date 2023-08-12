@@ -10,12 +10,14 @@ export const PetsView = () => {
   };
 
   return (
-    <div>
-      <button className="switch" onClick={toggleView}>
-        {isViewingSavedPets ? "My Pets" : "Saved Pets"}
-      </button>
+    <>
+      <div>
+        <button className="switch" onClick={toggleView}>
+          {isViewingSavedPets ? "My Pets" : "Saved Pets"}
+        </button>
 
-      {isViewingSavedPets ? <SavedPetsView /> : <MyPetsView />}
-    </div>
+        {isViewingSavedPets ? <SavedPetsView /> : <MyPetsView />}
+      </div>
+    </>
   );
 };

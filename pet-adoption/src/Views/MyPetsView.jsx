@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { LoginContext } from "../Context/LoginContext";
 import { Link } from "react-router-dom";
+import { Footer } from "../Components/Footer/Footer";
 
 export const MyPetsView = () => {
   const { userId, token } = useContext(LoginContext);
@@ -64,6 +65,7 @@ export const MyPetsView = () => {
           ))
         )}
       </div>
+      <Footer />
     </>
   );
 };

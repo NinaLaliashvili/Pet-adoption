@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { LoginContext } from "../Context/LoginContext";
 import "./view.css";
 import { BounceLoader } from "react-spinners";
+import { Footer } from "../Components/Footer/Footer";
 
 export const AllPetsView = () => {
   const { isLoggedIn, userId, token } = useContext(LoginContext);
@@ -365,6 +366,7 @@ export const AllPetsView = () => {
           <BounceLoader className="allpetsbounce" color={"#123abc"} size={60} />
         )}
       </div>
+      <Footer />
     </>
   );
 };
