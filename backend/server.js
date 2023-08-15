@@ -61,6 +61,7 @@ function authenticateToken(req, res, next) {
       return res.sendStatus(403);
     }
     req.user = user;
+    console.log(req.user);
     next();
   });
 }
@@ -246,6 +247,7 @@ app.post("/login", async (req, res) => {
     if (!match) {
       return res.status(400).send("Incorrect password.");
     }
+    console.log("User isAdmin:", user.isAdmin);
 
     const token = jwt.sign(
       { id: user._id.toString(), isAdmin: user.isAdmin },
