@@ -12,6 +12,7 @@ const nodemailer = require("nodemailer");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const { ObjectId } = require("mongodb");
 
+//connection with mongo db
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
   serverApi: {
@@ -21,6 +22,7 @@ const client = new MongoClient(uri, {
   },
 });
 
+//my two collections
 let usersCollection;
 let petsCollection;
 
@@ -72,7 +74,7 @@ app.get("/", (req, res) => {
   res.send("This is pet adoption project server");
 });
 
-//Get Users API - protected to admin
+//Get users api - protected to admin
 app.get("/users", async (req, res) => {
   try {
     const users = await usersCollection.find({}).toArray();
@@ -83,7 +85,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-//Get User By ID API
+//Get user by id api
 app.get("/user/:id", async (req, res) => {
   if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).send("Invalid ID format");
@@ -105,11 +107,12 @@ app.get("/user/:id", async (req, res) => {
   }
 });
 
-//Update User API
+//Update user api
 app.put("/user/:id", authenticateToken, async (req, res) => {
   try {
     const userId = new ObjectId(req.params.id);
 
+    //makje sure that user exists
     const existingUser = await usersCollection.findOne({ _id: userId });
     if (!existingUser) {
       return res.status(404).send("User not found.");
@@ -130,6 +133,7 @@ app.put("/user/:id", authenticateToken, async (req, res) => {
 
     await usersCollection.updateOne({ _id: userId }, { $set: updatedUser });
 
+    //server responds with the updated user data, but first it removes the password field to ensure that sensitive data is not exposed
     const { password: _, ...userWithoutPassword } = updatedUser;
     res.json(userWithoutPassword);
   } catch (error) {
@@ -230,11 +234,11 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  //check if every field is full
+  //check if these fields are full
   if (!email || !password) {
     return res.status(400).send("Please fill in all the required fields.");
   }
-
+  //find user in db
   try {
     const user = await usersCollection.findOne({ email });
 
@@ -256,7 +260,7 @@ app.post("/login", async (req, res) => {
         expiresIn: "48h",
       }
     );
-
+    //server responds with the updated user data, but first it removes the password field to ensure that sensitive data is not exposed
     const { password: _, ...userWithoutPassword } = user;
 
     res.json({ userId: user._id.toString(), user: userWithoutPassword, token });
@@ -268,7 +272,7 @@ app.post("/login", async (req, res) => {
 
 // ======================== pets get and post ===========================//
 
-//Get Pets API
+//Get pets api
 app.get("/pet", async (req, res) => {
   const { type, name, adoptionStatus, minHeight, maxHeight, weight } =
     req.query;
@@ -292,7 +296,7 @@ app.get("/pet", async (req, res) => {
   }
 });
 
-//Get Pet By ID API
+//Get pet by id api
 app.get("/pet/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -314,7 +318,7 @@ app.get("/pet/:id", async (req, res) => {
   }
 });
 
-//Add Pet API - admin
+//Add pet api - admin
 app.post("/pet", upload.single("image"), async (req, res) => {
   const {
     type,
@@ -354,7 +358,7 @@ app.post("/pet", upload.single("image"), async (req, res) => {
   }
 });
 
-//Edit Pet API - protected to admin only
+//Edit pet api - protected to admin only
 app.put("/pet/:id", upload.single("image"), async (req, res) => {
   const { id } = req.params;
 
@@ -406,7 +410,7 @@ app.put("/pet/:id", upload.single("image"), async (req, res) => {
   }
 });
 
-//Save Pet API
+//Save pet api
 app.post("/pet/:id/save", authenticateToken, async (req, res) => {
   const petId = new ObjectId(req.params.id);
   const userId = new ObjectId(req.user.id);
@@ -466,7 +470,7 @@ app.delete("/pet/:id/save", authenticateToken, async (req, res) => {
   }
 });
 
-//get User Saved Pets API
+//get user saved pets api
 app.get("/user/:id/savedPets", authenticateToken, async (req, res) => {
   const userId = new ObjectId(req.user.id);
 
@@ -494,7 +498,7 @@ app.get("/user/:id/savedPets", authenticateToken, async (req, res) => {
   }
 });
 
-//Adopt/Foster Pet API
+//adopt/foster pet api
 app.post("/pet/:id/adopt", authenticateToken, async (req, res) => {
   const petId = new ObjectId(req.params.id);
   const userId = new ObjectId(req.user.id);
